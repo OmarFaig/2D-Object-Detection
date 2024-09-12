@@ -1,8 +1,9 @@
 import os
-#import torchvision.transforms as transforms
 from PIL import Image
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 def vis_bbox(img,bboxes):
     if isinstance(img, Image.Image):
         image_np = np.array(img)  # Convert PIL image to NumPy array
@@ -25,3 +26,20 @@ def vis_bbox(img,bboxes):
     cv2.waitKey(0)  # Wait for a key press to close the window
     cv2.destroyAllWindows()
     cv2.waitKey(1)
+def visualize_image_with_bboxes(image, bboxes):
+    # Create a figure and axis
+    fig, ax = plt.subplots(1)
+    
+    # Display the image
+    ax.imshow(image)
+    
+    # Add bounding boxes
+    for bbox in bboxes:
+        xmin, ymin, width, height = bbox
+        # Create a rectangle patch (matplotlib uses (xmin, ymin, width, height))
+        rect = patches.Rectangle((xmin, ymin), width, height, linewidth=2, edgecolor='r', facecolor='none')
+        # Add the rectangle to the plot
+        ax.add_patch(rect)
+
+    plt.axis('off')  # Hide the axis
+    plt.show()  # Display the plot
