@@ -43,3 +43,36 @@ def visualize_image_with_bboxes(image, bboxes):
 
     plt.axis('off')  # Hide the axis
     plt.show()  # Display the plot
+def load_image_and_annotations(image_path, annotation_path):
+    # Load image
+    image = Image.open(image_path).convert("RGB")
+    
+    # Load annotation (bounding boxes and labels)
+    with open(annotation_path, 'r') as f:
+        annotations = json.load(f)
+        
+    bboxes = annotations['bboxes']  # list of [xmin, ymin, xmax, ymax] in normalized format
+    labels = annotations['object_id']  # category labels
+    
+    return image, bboxes, labels
+
+def draw_bounding_boxes(image, bboxes):
+    draw = ImageDraw.Draw(image)
+    width, height = image.size
+    
+    for bbox in bboxes:
+      #  xmin, ymin, xmax, ymax = bbox
+        xmin, ymin, width, height = bbox
+        xmax = xmin + width
+        ymax = ymin + height
+       # print(bbox)
+      # # Convert normalized bbox coordinates to absolute pixel coordinates
+      # xmin *= width
+      # xmax *= width
+      # ymin *= height
+      # ymax *= height
+      # 
+        # Draw the bounding box
+        draw.rectangle([xmin, ymin, xmax, ymax], outline="red", width=3)
+    
+    return image

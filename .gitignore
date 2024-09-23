@@ -144,6 +144,7 @@ football_dataset/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+yolo_football_dataset/
 
 # Pyre type checker
 .pyre/
@@ -153,7 +154,8 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-
+runs/
+yolov8n.pt
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore

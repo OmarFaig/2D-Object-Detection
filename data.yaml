@@ -1,0 +1,9 @@
+# Path to your dataset
+train: /home/omar/TUM/05_projects/2D-Object-Detection/yolo_football_dataset/train/images
+val: /home/omar/TUM/05_projects/2D-Object-Detection/yolo_football_dataset/val/images
+
+# Number of classes
+nc: 2  # Football players and the ball
+
+# Class names
+names: ['football_player', 'football']
