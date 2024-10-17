@@ -6,4 +6,4 @@ val: /home/omar/TUM/05_projects/2D-Object-Detection/yolo_football_dataset/val/im
 nc: 2  # Football players and the ball
 
 # Class names
-names: ['football_player', 'football']
+names: ['football_player', 'ball']

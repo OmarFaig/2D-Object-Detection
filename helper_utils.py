@@ -1,4 +1,5 @@
 import os
+import json
 from PIL import Image
 import numpy as np
 import cv2
@@ -76,3 +77,23 @@ def draw_bounding_boxes(image, bboxes):
         draw.rectangle([xmin, ymin, xmax, ymax], outline="red", width=3)
     
     return image
+def convert_to_yolo_format(annotations_dir, output_dir, image_shape):
+    for json_file in os.listdir(annotations_dir):
+        if json_file.endswith('.json'):
+            with open(os.path.join(annotations_dir, json_file)) as f:
+                annotations = json.load(f)
+
+            image_w, image_h = image_shape
+            txt_filename = os.path.splitext(json_file)[0] + '.txt'
+            with open(os.path.join(output_dir, txt_filename), 'w') as f:
+                for bbox in annotations['bboxes']:
+                    x_min, y_min, width, height = bbox
+
+                    # Normalize the bounding box coordinates
+                    x_center = (x_min + width / 2) / image_w
+                    y_center = (y_min + height / 2) / image_h
+                    w = width / image_w
+                    h = height / image_h
+
+                    # Write the class and normalized bounding box
+                    f.write(f"0 {x_center} {y_center} {w} {h}\n")

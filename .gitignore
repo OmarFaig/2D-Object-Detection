@@ -166,3 +166,5 @@ yolov8n.pt
 #env
 objDet/
 football-object-detection/
+yolov8n.pt
+yolov8m.pt
