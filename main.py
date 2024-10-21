@@ -9,17 +9,23 @@ from PIL import Image
 import json
 from datasets import load_dataset
 from ultralytics import YOLO
-from fastapi import FastAPI
+from fastapi import FastAPI, Form
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 print(tf.__version__)
 
 # Load a YOLOv8 model pre-trained on COCO
 model = YOLO("/home/omar/TUM/05_projects/2D-Object-Detection/runs/detect/football_yolov83/weights/last.pt")  # 'n' stands for nano, 's', 'm', 'l'.
 
 app = FastAPI()
+# Serve static files like your HTML, CSS, JS
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.get("/")
-async def root():
-    return {"message": "Hello, World!"}
+# Return the HTML page
+@app.get("/", response_class=HTMLResponse)
+async def get_home():
+    with open("static/index.html") as f:
+        return HTMLResponse(content=f.read())
 
 
 @app.post("/to_be_predicted")
