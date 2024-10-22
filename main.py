@@ -9,9 +9,11 @@ from PIL import Image
 import json
 from datasets import load_dataset
 from ultralytics import YOLO
-from fastapi import FastAPI, Form
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Form,File,UploadFile
+from fastapi.responses import HTMLResponse,JSONResponse
 from fastapi.staticfiles import StaticFiles
+from typing import List
+import shutil
 print(tf.__version__)
 
 # Load a YOLOv8 model pre-trained on COCO
@@ -40,3 +42,16 @@ async def predict_object(image_path: str):
 
     #result.save(tmp_folder, result)
     return {"message": "results are saved"}
+
+# Route for uploading images
+@app.post("/upload-images")
+async def upload_images(files: List[UploadFile] = File(...)):
+    # Save uploaded images to a folder (e.g., 'uploaded_images/')
+    upload_folder = "tmp/inference/"
+    for file in files:
+        file_location = f"{upload_folder}{file.filename}"
+        with open(file_location, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    
+    # Return a response indicating successful upload
+    return JSONResponse({"message": f"Successfully uploaded {len(files)} files"})

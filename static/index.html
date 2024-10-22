@@ -14,18 +14,24 @@
         <h1>Deployment of a YOLOv8 Model on Football Dataset</h1>
         <p>Upload an image on the left side, and the prediction results will be displayed on the right side.</p>
     </header>
+<!--    <input 
+    id="myImage"
+    class="photo-upload"
+    type="file"
+    accept="image/*, image/jpeg">
 
-
+<img id="the-picture" width="200" /> 
+-->
     <div id="image-upload-container">
-        <!-- Hiding the default file input field -->
-        <input type="file" id="image-upload" accept="image/*" multiple style="display: none;">
+
+    <input type="file" id="image-upload" accept="image/*" multiple style="display: none;">
         <button id="image-upload-button">Upload Images</button>
     </div>
 
     <div id="image-container">Uploaded images will appear here</div>
     <div id="prediction-container">Prediction results will appear here</div>
   
-    <script src="index.js" type="text/javascript"></script>
+    <script src="static/index.js" type="text/javascript"></script>
 
 </body>
 </html>

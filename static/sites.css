@@ -20,6 +20,7 @@ header {
 
 header h1 {
     color: #2e7d32; /* Dark green for the title */
+    font-size: 2.5em;
     margin-bottom: 10px;
 }
 
@@ -37,6 +38,8 @@ header p {
     padding: 20px;
     border-radius: 10px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
 }
 
 #image-upload-container:hover {
@@ -45,6 +48,8 @@ header p {
 
 /* Styling for the input and button */
 #image-upload {
+    display: none; /* Hide the default file input */
+
     margin: 10px 0;
 }
 
