@@ -39,6 +39,7 @@ imageInput.addEventListener('change', async (event) => {
                 // Get the result image from the server
                 const blob = await response.blob();
                 const imgUrl = URL.createObjectURL(blob);
+                predcitionContainer.innerHTML = ''; // Clear the container before adding new images
 
                 // Display the returned image
                 const img = document.createElement('img');

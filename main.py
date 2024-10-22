@@ -77,10 +77,14 @@ async def predict(file: UploadFile = File(...)):
     # Load image in memory
     image_data = await file.read()
     image = Image.open(BytesIO(image_data))
-    
+   # img = Image.open(image_data)
+    #tmp_folder = "/home/omar/TUM/05_projects/2D-Object-Detection/tmp"
+
     # Run YOLO on image (this part depends on your specific YOLO implementation)
     results = model(image, save=False)  # Assuming this returns a list of results
+    #result = model(img, save=True, project=tmp_folder, name="inference", exist_ok=True)
 
+    print(results)
     # Extract the processed image from results (this depends on your model's output structure)
     processed_image = results[0]  # Modify this according to your output
 
