@@ -21,7 +21,14 @@ print(tf.__version__)
 
 # Load a YOLOv8 model pre-trained on COCO
 model = YOLO("/home/omar/TUM/05_projects/2D-Object-Detection/runs/detect/football_yolov83/weights/last.pt")  # 'n' stands for nano, 's', 'm', 'l'.
+#results = model('football_dataset/test/images/7.png')
 
+# Access the first result in the list
+#result = results[0]
+
+# Display the results
+#result.show()
+#result.plot()  # This will plot the results on the image
 app = FastAPI()
 # Serve static files like your HTML, CSS, JS
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -77,37 +84,28 @@ async def predict(file: UploadFile = File(...)):
     # Load image in memory
     image_data = await file.read()
     image = Image.open(BytesIO(image_data))
-   # img = Image.open(image_data)
-    #tmp_folder = "/home/omar/TUM/05_projects/2D-Object-Detection/tmp"
 
-    # Run YOLO on image (this part depends on your specific YOLO implementation)
-    results = model(image, save=False)  # Assuming this returns a list of results
-    #result = model(img, save=True, project=tmp_folder, name="inference", exist_ok=True)
+    # Run YOLO on image
+    results = model(image, save=False) 
+    #print(f"results = {results}")
+    result=results[0]
+    # Extract bounding box details from results
+    boxes = []
+    if hasattr(result, 'boxes') and result.boxes is not None:
+        # Assuming results.boxes.xyxy is available
+        boxes = result.boxes.xyxy.tolist()  # Convert tensor to list of boxes
+    print(f"boxes: {boxes}")
 
-    print(results)
-    # Extract the processed image from results (this depends on your model's output structure)
-    processed_image = results[0]  # Modify this according to your output
-
-    # If the processed_image is still an image, convert it
-    if isinstance(processed_image, list):
-        # You might need to visualize the results by drawing bounding boxes on the original image
-        # This is a placeholder - replace it with actual drawing logic based on the model's output
-        for detection in processed_image:
-            # Assuming each detection has bounding box coordinates
-            x1, y1, x2, y2 = detection['bbox']
-            # Draw bounding box on the image (you can use PIL or OpenCV for this)
-            draw = ImageDraw.Draw(image)
-            draw.rectangle([x1, y1, x2, y2], outline="red", width=3)
+    # Draw bounding boxes on the image
+    draw = ImageDraw.Draw(image)
+    for box in boxes:
+       # print(f'Drawing boxes - {box}')
+        x1, y1, x2, y2 = box
+        draw.rectangle([x1, y1, x2, y2], outline="red", width=3)
 
     # Save the modified image to response
     response = BytesIO()
     image.save(response, format="JPEG")
     response.seek(0)
-
+   # print(f"response : {response}")
     return StreamingResponse(response, media_type="image/jpeg")
-def draw_boxes(image, boxes):
-    draw = ImageDraw.Draw(image)
-    for box in boxes:  # Assuming box is a list of [x1, y1, x2, y2]
-        draw.rectangle(box, outline="red", width=3)  # Draw each bounding box
-    return image
-
