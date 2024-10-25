@@ -60,7 +60,7 @@ from PIL import Image
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
+from matplotlib import patches
 def vis_bbox(img,bboxes):
     if isinstance(img, Image.Image):
         image_np = np.array(img)  # Convert PIL image to NumPy array
