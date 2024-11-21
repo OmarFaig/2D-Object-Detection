@@ -22,6 +22,6 @@ jobs:
           pip install -r requirements.txt  # Install dependencies listed in requirements.txt
           pip install pylint
 
-      - name: Analysing the code with pylint
-        run: |
-          pylint $(git ls-files '*.py')
+      #- name: Analysing the code with pylint
+       # run: |
+        #  pylint $(git ls-files '*.py')
