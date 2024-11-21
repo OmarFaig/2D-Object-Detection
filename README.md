@@ -37,7 +37,7 @@ The model used for object detection is YOLOv8 (You Only Look Once version 8). YO
 
 Here are some example results from the model:
 
-![Result 1](res/result_1.jpeg)
-![Result 2](res/result_2.jpeg)
+![Result 1](res/resut_1.jpeg)
+![Result 2](res/resut_2.jpeg)
 
 The model successfully detects football players and the ball in the images, as shown in the results above.
