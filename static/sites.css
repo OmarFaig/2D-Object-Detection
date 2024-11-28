@@ -1,88 +1,38 @@
-/* Importing niche fonts from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
-
-/* Basic styling for the whole page */
-body {
-    font-family: 'Quicksand', sans-serif;
-    background-color: #e0f7da; /* Light green background */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+/* Reset any previous styles */
+* {
+    box-sizing: border-box;
     margin: 0;
-    height: 100vh;
+    padding: 0;
 }
 
-header {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-header h1 {
-    color: #2e7d32; /* Dark green for the title */
-    font-size: 2.5em;
-    margin-bottom: 10px;
-}
-
-header p {
-    color: #388e3c; /* Medium green for the paragraph */
-}
-
-/* Styling for the upload container */
-#image-upload-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #c8e6c9; /* Slightly darker green background */
-    border: 2px dashed #4caf50; /* Green border for the drag-and-drop area */
+body {
     padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    margin-top: 20px;
-}
-
-#image-upload-container:hover {
-    background-color: #b2dfdb; /* Lighter color on hover */
-}
-
-/* Styling for the input and button */
-#image-upload {
-    display: none; /* Hide the default file input */
-
-    margin: 10px 0;
+    display: flex;  /* Make body a flex container */
+    gap: 20px;
 }
 
 #image-upload-button {
-    background-color: #4caf50; /* Green button */
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.3s;
+    display: block;
+    margin-bottom: 15px;
 }
 
-#image-upload-button:hover {
-    background-color: #388e3c; /* Darker green on hover */
+/* Create a container for the two sections */
+.results-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;  /* Divides into two equal columns */
+    gap: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
 }
 
-/* Containers for the uploaded images and predictions */
+/* Basic styling for the inner containers */
 #image-container, #prediction-container {
-    display: inline-block;
-    width: 45%;
-    vertical-align: top;
-    text-align: center;
-    margin: 10px;
+    width: 100%;
 }
 
-#image-container {
-    border: 1px solid #4caf50;
-    padding: 10px;
-}
-
-#prediction-container {
-    border: 1px solid #4caf50;
-    padding: 10px;
+/* Ensure images fit within containers */
+#image-container img, #prediction-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
