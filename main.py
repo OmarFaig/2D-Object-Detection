@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 import tensorflow as tf
-from PIL import Image,ImageDraw
+from PIL import Image,ImageDraw,ImageFont
 import json
 from datasets import load_dataset
 from ultralytics import YOLO
@@ -87,25 +87,39 @@ async def predict(file: UploadFile = File(...)):
 
     # Run YOLO on image
     results = model(image, save=False) 
-    #print(f"results = {results}")
-    result=results[0]
-    # Extract bounding box details from results
-    boxes = []
-    if hasattr(result, 'boxes') and result.boxes is not None:
-        # Assuming results.boxes.xyxy is available
-        boxes = result.boxes.xyxy.tolist()  # Convert tensor to list of boxes
-    print(f"boxes: {boxes}")
-
-    # Draw bounding boxes on the image
+    result = results[0]
+    
+    # Create ImageDraw object
     draw = ImageDraw.Draw(image)
-    for box in boxes:
-       # print(f'Drawing boxes - {box}')
-        x1, y1, x2, y2 = box
-        draw.rectangle([x1, y1, x2, y2], outline="red", width=3)
+    # Create a font object (you might need to adjust the size)
+    font = ImageFont.truetype("arial.ttf", 16)  # Use a system font
+    
+    if hasattr(result, 'boxes') and result.boxes is not None:
+        boxes = result.boxes
+        for box in boxes:
+            # Get box coordinates
+            x1, y1, x2, y2 = box.xyxy[0]  # Get box coordinates
+            
+            # Get confidence and class
+            conf = float(box.conf[0])
+            cls = int(box.cls[0])
+            class_name = result.names[cls]  # Get class name from model's names dict
+            
+            # Draw box
+            draw.rectangle([x1, y1, x2, y2], outline="red", width=3)
+            
+            # Create label with class name and confidence
+            label = f"{class_name} {conf:.2f}"
+            
+            # Draw label background
+            text_bbox = draw.textbbox((x1, y1), label, font=font)
+            draw.rectangle(text_bbox, fill="blue")
+            
+            # Draw white text
+            draw.text((x1, y1), label, fill="white", font=font)
 
-    # Save the modified image to response
+    # Save the modified image
     response = BytesIO()
     image.save(response, format="JPEG")
     response.seek(0)
-   # print(f"response : {response}")
     return StreamingResponse(response, media_type="image/jpeg")

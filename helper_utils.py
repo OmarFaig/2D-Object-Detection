@@ -61,6 +61,7 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 from matplotlib import patches
+
 def vis_bbox(img,bboxes):
     if isinstance(img, Image.Image):
         image_np = np.array(img)  # Convert PIL image to NumPy array
@@ -84,6 +85,7 @@ def vis_bbox(img,bboxes):
     cv2.waitKey(0)  # Wait for a key press to close the window
     cv2.destroyAllWindows()
     cv2.waitKey(1)
+
 def visualize_image_with_bboxes(image, bboxes):
     # Create a figure and axis
     fig, ax = plt.subplots(1)
@@ -100,6 +102,7 @@ def visualize_image_with_bboxes(image, bboxes):
 
     plt.axis('off')  # Hide the axis
     plt.show()  # Display the plot
+
 def load_image_and_annotations(image_path, annotation_path):
     # Load image
     image = Image.open(image_path).convert("RGB")
@@ -111,6 +114,7 @@ def load_image_and_annotations(image_path, annotation_path):
     labels = annotations['object_id']  # category labels
     
     return image, bboxes, labels
+
 def draw_bounding_boxes(image, bboxes):
     draw = ImageDraw.Draw(image)
     width, height = image.size
@@ -130,6 +134,7 @@ def draw_bounding_boxes(image, bboxes):
         # Draw the bounding box
         draw.rectangle([xmin, ymin, xmax, ymax], outline="red", width=3)
     return image
+
 def convert_to_yolo_format(annotations_dir, output_dir, image_shape):
     for json_file in os.listdir(annotations_dir):
         if json_file.endswith('.json'):
