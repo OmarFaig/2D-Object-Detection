@@ -1,0 +1,20 @@
+.results-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.input-image, .output-image,
+.input-video, .output-video {
+  border: 1px dashed #ccc;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-area {
+  text-align: center;
+  margin-bottom: 1rem;
+} 
