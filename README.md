@@ -1,18 +1,29 @@
-# 2D-Object-Detection
+# Vision Analytics Hub
 
-This project implements a 2D object detection model using YOLOv8. The model is trained to detect football players and the ball in images.
+A versatile computer vision analytics platform that combines modern CV algorithms with an interactive web interface. Upload any dataset, visualize results, and analyze patterns through our comprehensive suite of computer vision tools.
 
-## Dataset
+## Key Features (In Development)
+- 🔍 Universal Object Detection & Tracking
+- 📊 Real-time Data Visualization
+- 🎯 Custom Model Integration
+- 🖼️ Support for Various Data Types:
+  - Images
+  - Videos
+  - Real-time Streams
+  - Custom Data Sources
 
-The dataset used for training the model is a custom football dataset. It contains images of football matches with annotations for football players and the ball. The dataset is organized into three subsets: `train`, `val`, and `test`, each containing images and their corresponding annotations.
+## Architecture
+- **CV Pipeline:** YOLOv8, OpenCV
+- **Frontend:** React-based dashboard
+- **Backend:** FastAPI/Flask
+- **Analytics:** Custom visualization tools using D3.js/Three.js
 
-## Model
+## Project Status
+🚧 Active Development: Core features are being implemented and the architecture may evolve.
 
-The model used for object detection is YOLOv8 (You Only Look Once version 8). YOLOv8 is a state-of-the-art, real-time object detection system that is fast and accurate. The model is pre-trained on the COCO dataset and fine-tuned on the custom football dataset.
+## Quick Start
 
-## Setup
-
-1. Clone the repository:
+1. Clone and install:
    ```sh
    git clone <repository-url>
    cd <repository-directory>
