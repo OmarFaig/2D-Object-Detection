@@ -17,4 +17,103 @@
 .upload-area {
   text-align: center;
   margin-bottom: 1rem;
+}
+
+.zoom-icon {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.zoom-icon:hover {
+  transform: scale(1.2);
+}
+
+.modal-results-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+  height: 100%;
+  width: 100%;
+}
+
+.modal-results-container .input-image,
+.modal-results-container .output-image {
+  min-height: 100%;
+}
+
+/* Fullscreen modal styles */
+.vision-modal .modal-content {
+    height: 100vh;
+    border: none;
+    border-radius: 0;
+}
+
+.fullscreen-content {
+    height: 100%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.fullscreen-results-container {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 20px;
+    height: calc(100vh - 200px);  /* Adjust based on your header/upload area height */
+}
+
+.input-section,
+.output-section {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.input-section h4,
+.output-section h4 {
+    margin-bottom: 1rem;
+}
+
+.input-image,
+.output-image {
+    flex: 1;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    overflow: hidden;
+}
+
+.input-image img,
+.output-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.zoom-icon {
+    cursor: pointer;
+    transition: transform 0.2s;
+    font-size: 1.2rem;
+    color: #0d6efd;
+}
+
+.zoom-icon:hover {
+    transform: scale(1.2);
+}
+
+/* Make upload area more prominent */
+.upload-area {
+    text-align: center;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.upload-area button {
+    padding: 0.5rem 2rem;
 } 
