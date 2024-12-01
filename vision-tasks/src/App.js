@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Card, Button, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Modal, Form } from 'react-bootstrap';
 import { BsZoomIn } from 'react-icons/bs';  // Import zoom icon
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
@@ -7,6 +7,9 @@ import './App.css';
 function App() {
   const [showModal, setShowModal] = useState(false);
   const [activeTask, setActiveTask] = useState(null);
+  const [selectedModel, setSelectedModel] = useState('yolov8n');
+  const [bboxColor, setBboxColor] = useState('#FF0000');
+  const [confidenceThreshold, setConfidenceThreshold] = useState(0.5);
 
   const handleZoom = (taskName) => {
     setActiveTask(taskName);
@@ -176,7 +179,7 @@ function App() {
       <Modal 
         show={showModal} 
         onHide={() => setShowModal(false)}
-        fullscreen={true}  // This makes it fullscreen
+        fullscreen={true}
         className="vision-modal"
       >
         <Modal.Header closeButton>
@@ -190,6 +193,94 @@ function App() {
                 Upload Image
               </Button>
             </div>
+            
+            {/* Add checkbox options when Object Detection is active */}
+            {activeTask === 'Object Detection' && (
+              <div className="detection-options mb-3">
+                <h5>Detection Options:</h5>
+                <Form>
+                  {/* Model Selection */}
+                  <Form.Group className="mb-3">
+                    <Form.Label>Model</Form.Label>
+                    <Form.Select 
+                      value={selectedModel}
+                      onChange={(e) => setSelectedModel(e.target.value)}
+                    >
+                      <option value="yolov8n">YOLOv8 Nano</option>
+                      <option value="yolov8s">YOLOv8 Small</option>
+                      <option value="yolov8m">YOLOv8 Medium</option>
+                      <option value="yolov8l">YOLOv8 Large</option>
+                      <option value="yolov8x">YOLOv8 XLarge</option>
+                    </Form.Select>
+                  </Form.Group>
+
+                  {/* Visualization Options */}
+                  <Form.Group className="mb-3">
+                    <Form.Label>Bounding Box Color</Form.Label>
+                    <Form.Control
+                      type="color"
+                      value={bboxColor}
+                      onChange={(e) => setBboxColor(e.target.value)}
+                      title="Choose bounding box color"
+                    />
+                  </Form.Group>
+
+                  {/* Confidence Threshold */}
+                  <Form.Group className="mb-3">
+                    <Form.Label>Confidence Threshold: {confidenceThreshold}</Form.Label>
+                    <Form.Range
+                      min={0}
+                      max={1}
+                      step={0.05}
+                      value={confidenceThreshold}
+                      onChange={(e) => setConfidenceThreshold(parseFloat(e.target.value))}
+                    />
+                  </Form.Group>
+
+                  {/* Checkboxes */}
+                  <Form.Group className="mb-3">
+                    <Form.Check 
+                      type="checkbox"
+                      id="bbox-checkbox"
+                      label="Show Bounding Boxes"
+                      defaultChecked
+                    />
+                    <Form.Check 
+                      type="checkbox"
+                      id="labels-checkbox"
+                      label="Show Labels"
+                      defaultChecked
+                    />
+                    <Form.Check 
+                      type="checkbox"
+                      id="confidence-checkbox"
+                      label="Show Confidence Scores"
+                      defaultChecked
+                    />
+                  </Form.Group>
+
+                  {/* Additional Options */}
+                  <Form.Group className="mb-3">
+                    <Form.Label>Label Font Size</Form.Label>
+                    <Form.Select defaultValue="medium">
+                      <option value="small">Small</option>
+                      <option value="medium">Medium</option>
+                      <option value="large">Large</option>
+                    </Form.Select>
+                  </Form.Group>
+
+                  {/* Video-specific options */}
+                  <Form.Group className="mb-3">
+                    <Form.Check 
+                      type="checkbox"
+                      id="tracking-checkbox"
+                      label="Enable Tracking (for videos)"
+                    />
+                  </Form.Group>
+                </Form>
+              </div>
+            )}
+
             <div className="fullscreen-results-container">
               <div className="input-section">
                 <h4>Input Image</h4>
