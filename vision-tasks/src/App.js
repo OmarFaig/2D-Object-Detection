@@ -10,10 +10,60 @@ function App() {
   const [selectedModel, setSelectedModel] = useState('yolov8n');
   const [bboxColor, setBboxColor] = useState('#FF0000');
   const [confidenceThreshold, setConfidenceThreshold] = useState(0.5);
+  const [images, setImages] = useState([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [detectionResult, setDetectionResult] = useState(null);
 
   const handleZoom = (taskName) => {
     setActiveTask(taskName);
     setShowModal(true);
+  };
+
+  const handleFolderSelect = (event) => {
+    const files = Array.from(event.target.files);
+    const imageFiles = files.filter(file => 
+      file.type.startsWith('image/')
+    );
+    
+    setImages(imageFiles);
+    setCurrentImageIndex(0);
+    if (imageFiles.length > 0) {
+      processImage(imageFiles[0]);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentImageIndex > 0) {
+      setCurrentImageIndex(prev => prev - 1);
+      processImage(images[currentImageIndex - 1]);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentImageIndex < images.length - 1) {
+      setCurrentImageIndex(prev => prev + 1);
+      processImage(images[currentImageIndex + 1]);
+    }
+  };
+
+  const processImage = async (imageFile) => {
+    const formData = new FormData();
+    formData.append('file', imageFile);
+
+    try {
+      const response = await fetch('http://localhost:8000/api/detect', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Detection failed');
+
+      const blob = await response.blob();
+      setDetectionResult(URL.createObjectURL(blob));
+    } catch (error) {
+      console.error('Error during detection:', error);
+      // Handle error appropriately
+    }
   };
 
   return (
@@ -187,14 +237,7 @@ function App() {
         </Modal.Header>
         <Modal.Body>
           <div className="fullscreen-content">
-            <div className="upload-area">
-              <input type="file" id="modal-upload" hidden />
-              <Button variant="primary" onClick={() => document.getElementById('modal-upload').click()}>
-                Upload Image
-              </Button>
-            </div>
-            
-            {/* Add checkbox options when Object Detection is active */}
+            {/* Detection Options */}
             {activeTask === 'Object Detection' && (
               <div className="detection-options mb-3">
                 <h5>Detection Options:</h5>
@@ -280,15 +323,68 @@ function App() {
                 </Form>
               </div>
             )}
+            
+            {/* Image Upload and Navigation */}
+            <div className="upload-area mb-3">
+              <input 
+                type="file" 
+                id="folder-upload" 
+                hidden 
+                webkitdirectory="" 
+                directory=""
+                onChange={handleFolderSelect}
+              />
+              <Button 
+                variant="primary" 
+                onClick={() => document.getElementById('folder-upload').click()}
+              >
+                Select Folder
+              </Button>
+              
+              {images.length > 0 && (
+                <div className="navigation-controls mt-2">
+                  <Button 
+                    variant="secondary" 
+                    onClick={handlePrevious}
+                    disabled={currentImageIndex === 0}
+                  >
+                    Previous
+                  </Button>
+                  <span className="mx-2">
+                    Image {currentImageIndex + 1} of {images.length}
+                  </span>
+                  <Button 
+                    variant="secondary" 
+                    onClick={handleNext}
+                    disabled={currentImageIndex === images.length - 1}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+            </div>
 
+            {/* Results Display */}
             <div className="fullscreen-results-container">
               <div className="input-section">
                 <h4>Input Image</h4>
-                <div className="input-image"></div>
+                {images.length > 0 && (
+                  <img 
+                    src={URL.createObjectURL(images[currentImageIndex])}
+                    alt="Input"
+                    style={{ maxWidth: '100%', height: 'auto' }}
+                  />
+                )}
               </div>
               <div className="output-section">
-                <h4>Result</h4>
-                <div className="output-image"></div>
+                <h4>Detection Result</h4>
+                {detectionResult && (
+                  <img 
+                    src={detectionResult}
+                    alt="Detection Result"
+                    style={{ maxWidth: '100%', height: 'auto' }}
+                  />
+                )}
               </div>
             </div>
           </div>
