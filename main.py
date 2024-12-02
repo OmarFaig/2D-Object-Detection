@@ -1,84 +1,110 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
+import numpy as np
 import uvicorn
 from ultralytics import YOLO
+import os
+
 app = FastAPI()
 
-# Add CORS middleware for React frontend
+# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React dev server
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Your existing model initialization
-model = YOLO("/home/omar/TUM/05_projects/2D-Object-Detection/runs/detect/football_yolov83/weights/last.pt")  # 'n' stands for nano, 's', 'm', 'l'.
+# Initialize model - you might want to make this configurable
+model = YOLO("yolov8n.pt")  # Using the default YOLO model for now
 
 @app.post("/api/detect")
 async def detect(file: UploadFile = File(...)):
-    # Your existing object detection code
-    image_data = await file.read()
-    image = Image.open(BytesIO(image_data))
+    try:
+        # Read and validate the image
+        contents = await file.read()
+        image = Image.open(BytesIO(contents))
+        
+        # Convert to RGB if necessary
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+        
+        # Run inference
+        results = model(image, conf=0.25)  # Adjust confidence threshold as needed
+        result = results[0]
+        
+        # Create a copy of the image for drawing
+        output_image = image.copy()
+        draw = ImageDraw.Draw(output_image)
+        
+        # Try to load a better font, fallback to default if not available
+        try:
+            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 12)
+        except:
+            font = ImageFont.load_default()
 
-    # Run YOLO on image
-    results = model(image, save=False) 
-    result = results[0]
-    
-    # Create ImageDraw object
-    draw = ImageDraw.Draw(image)
-    font = ImageFont.load_default()  # or use truetype font if available
-    
-    if hasattr(result, 'boxes') and result.boxes is not None:
-        boxes = result.boxes
-        for box in boxes:
-            # Get box coordinates
-            x1, y1, x2, y2 = box.xyxy[0]
-            
-            # Get confidence and class
-            conf = float(box.conf[0])
-            cls = int(box.cls[0])
-            class_name = result.names[cls]
-            
-            # Draw box
-            draw.rectangle([x1, y1, x2, y2], outline="red", width=3)
-            
-            # Create label with class name and confidence
-            label = f"{class_name} {conf:.2f}"
-            
-            # Draw label background
-            text_bbox = draw.textbbox((x1, y1), label, font=font)
-            draw.rectangle(text_bbox, fill="red")
-            
-            # Draw white text
-            draw.text((x1, y1), label, fill="white", font=font)
+        # Draw detections
+        if hasattr(result, 'boxes') and result.boxes is not None:
+            boxes = result.boxes
+            for box in boxes:
+                # Get box coordinates
+                x1, y1, x2, y2 = [int(x) for x in box.xyxy[0]]
+                
+                # Get confidence and class
+                conf = float(box.conf[0])
+                cls = int(box.cls[0])
+                class_name = result.names[cls]
+                
+                # Draw box
+                draw.rectangle([x1, y1, x2, y2], outline="red", width=2)
+                
+                # Create label
+                label = f"{class_name} {conf:.2f}"
+                
+                # Get text size
+                text_bbox = draw.textbbox((x1, y1), label, font=font)
+                
+                # Draw label background
+                draw.rectangle(
+                    [text_bbox[0], text_bbox[1], text_bbox[2], text_bbox[3]],
+                    fill="red"
+                )
+                
+                # Draw text
+                draw.text((x1, y1), label, fill="white", font=font)
 
-    # Save and return the image
-    response = BytesIO()
-    image.save(response, format="JPEG")
-    response.seek(0)
-    return StreamingResponse(response, media_type="image/jpeg")
+        # Save and return the image
+        output_buffer = BytesIO()
+        output_image.save(output_buffer, format="JPEG", quality=95)
+        output_buffer.seek(0)
+        
+        return StreamingResponse(
+            output_buffer, 
+            media_type="image/jpeg",
+            headers={
+                'Content-Disposition': f'inline; filename="{file.filename}"'
+            }
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/segment")
-async def segment(file: UploadFile = File(...)):
-    # Instance segmentation code - implement when needed
-    # You'll need a segmentation model like YOLOv8-seg
-    pass
-
-@app.post("/api/semantic-segment")
-async def semantic_segment(file: UploadFile = File(...)):
-    # Semantic segmentation code - implement when needed
-    pass
-
-@app.post("/api/track")
-async def track(file: UploadFile = File(...)):
-    # Object tracking code - implement when needed
-    # You'll need a tracking model like YOLOv8-track
-    pass
+# Add endpoint to get available models
+@app.get("/api/models")
+async def get_models():
+    return {
+        "models": [
+            "yolov8n",
+            "yolov8s",
+            "yolov8m",
+            "yolov8l",
+            "yolov8x"
+        ]
+    }
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

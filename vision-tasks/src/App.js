@@ -13,6 +13,8 @@ function App() {
   const [images, setImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [detectionResult, setDetectionResult] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleZoom = (taskName) => {
     setActiveTask(taskName);
@@ -47,6 +49,9 @@ function App() {
   };
 
   const processImage = async (imageFile) => {
+    setIsLoading(true);
+    setError(null);
+    
     const formData = new FormData();
     formData.append('file', imageFile);
 
@@ -56,13 +61,17 @@ function App() {
         body: formData,
       });
 
-      if (!response.ok) throw new Error('Detection failed');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const blob = await response.blob();
       setDetectionResult(URL.createObjectURL(blob));
     } catch (error) {
       console.error('Error during detection:', error);
-      // Handle error appropriately
+      setError('Failed to process image. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -337,6 +346,7 @@ function App() {
               <Button 
                 variant="primary" 
                 onClick={() => document.getElementById('folder-upload').click()}
+                disabled={isLoading}
               >
                 Select Folder
               </Button>
@@ -346,7 +356,7 @@ function App() {
                   <Button 
                     variant="secondary" 
                     onClick={handlePrevious}
-                    disabled={currentImageIndex === 0}
+                    disabled={currentImageIndex === 0 || isLoading}
                   >
                     Previous
                   </Button>
@@ -356,13 +366,20 @@ function App() {
                   <Button 
                     variant="secondary" 
                     onClick={handleNext}
-                    disabled={currentImageIndex === images.length - 1}
+                    disabled={currentImageIndex === images.length - 1 || isLoading}
                   >
                     Next
                   </Button>
                 </div>
               )}
             </div>
+
+            {/* Error Display */}
+            {error && (
+              <div className="alert alert-danger" role="alert">
+                {error}
+              </div>
+            )}
 
             {/* Results Display */}
             <div className="fullscreen-results-container">
@@ -378,7 +395,13 @@ function App() {
               </div>
               <div className="output-section">
                 <h4>Detection Result</h4>
-                {detectionResult && (
+                {isLoading ? (
+                  <div className="text-center p-4">
+                    <div className="spinner-border" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                ) : detectionResult && (
                   <img 
                     src={detectionResult}
                     alt="Detection Result"
