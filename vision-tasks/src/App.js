@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Modal, Form } from 'react-bootstrap';
 import { BsZoomIn } from 'react-icons/bs';  // Import zoom icon
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -15,6 +15,8 @@ function App() {
   const [detectionResult, setDetectionResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isModelLoading, setIsModelLoading] = useState(false);
+  const [labelSize, setLabelSize] = useState('medium');
 
   const handleZoom = (taskName) => {
     setActiveTask(taskName);
@@ -54,6 +56,17 @@ function App() {
     
     const formData = new FormData();
     formData.append('file', imageFile);
+    formData.append('model_name', selectedModel);
+    formData.append('conf_threshold', confidenceThreshold.toString());
+    formData.append('bbox_color', bboxColor);
+    formData.append('label_size', labelSize);
+
+    console.log('Sending request with params:', {
+      model: selectedModel,
+      conf: confidenceThreshold,
+      color: bboxColor,
+      labelSize: labelSize
+    });
 
     try {
       const response = await fetch('http://localhost:8000/api/detect', {
@@ -62,7 +75,8 @@ function App() {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
       const blob = await response.blob();
@@ -74,6 +88,26 @@ function App() {
       setIsLoading(false);
     }
   };
+
+  const handleModelChange = async (e) => {
+    const newModel = e.target.value;
+    setIsModelLoading(true);
+    setSelectedModel(newModel);
+    
+    try {
+      if (images.length > 0) {
+        await processImage(images[currentImageIndex]);
+      }
+    } finally {
+      setIsModelLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (images.length > 0 && !isLoading) {
+      processImage(images[currentImageIndex]);
+    }
+  }, [selectedModel, confidenceThreshold, bboxColor, labelSize]);
 
   return (
     <Container fluid className="p-4">
@@ -256,7 +290,8 @@ function App() {
                     <Form.Label>Model</Form.Label>
                     <Form.Select 
                       value={selectedModel}
-                      onChange={(e) => setSelectedModel(e.target.value)}
+                      onChange={handleModelChange}
+                      disabled={isModelLoading}
                     >
                       <option value="yolov8n">YOLOv8 Nano</option>
                       <option value="yolov8s">YOLOv8 Small</option>
@@ -265,6 +300,12 @@ function App() {
                       <option value="yolov8x">YOLOv8 XLarge</option>
                     </Form.Select>
                   </Form.Group>
+
+                  {isModelLoading && (
+                    <div className="text-muted small mt-1">
+                      Loading model...
+                    </div>
+                  )}
 
                   {/* Visualization Options */}
                   <Form.Group className="mb-3">
